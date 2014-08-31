@@ -1,0 +1,6 @@
+<?php
+include("../require.php");
+$ads = $_GET['ads'];
+displayHead("../style/style.css","../style/ligong.js","../");
+displayPhoto($ads);
+?>

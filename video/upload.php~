@@ -1,0 +1,78 @@
+<?php
+include("../require.php");
+include("UploadVideo.php");
+displayHead();
+$ftype = $_FILES['file']['type'];
+$fname = $_FILES['file']['name'];
+$fsize = $_FILES['file']['size'];
+$ftmp_path = $_FILES['file']['tmp_name'];
+$ferror = $_FILES['file']['error'];
+
+$person=$_SESSION['email'];
+$email=$person->getElement('email');
+$name = $person->getElement('name');
+$iduser = $person->getElement('iduser');
+$dir="upload/".$email."/";
+
+$upload = new UploadVideo($ftype,$fname,$fsize,$ftmp_path,$ferror,$db);
+$upload->setElement('max_size',1024*1024*2000);
+
+if ($upload->testError()&&$upload->testSize()){
+		if($upload->saveVideo($iduser,$dir)){
+			$upload->skipTo(2,'publish.php');
+		}
+		else{
+			$upload->skipTo(2,'publish.php');
+		}
+
+}
+else{
+  	echo $_FILES["file"]["type"]."Invalid file";
+}
+  
+  /*
+  if (!is_dir($dir))
+		{
+			mkdir($dir);
+		}
+		$being_timestamp = strtotime('2014-05-03');
+		$time = explode(' ', microtime());
+		$id = ($time[1]-$being_timestamp).sprintf('%06',substr($time[0],2,6));
+		
+		$suffix = explode('.',$_FILES['file']['name']);
+		if (count($suffix)>1){$suffix = $suffix[count($suffix)-1];}
+		else{$suffix = $suffix[0];}
+		$address = $dir."/".$id.".".$suffix;
+		$length = $_FILES["file"]["size"];
+		$title = $_FILES["file"]["name"];
+		/
+		 idvideo     | int(11)   | NO   | PRI | NULL    | auto_increment
+		 iduser      | int(11)   | NO   |     | NULL    |
+		 title       | char(50)  | NO   |     | NULL    |
+		 description | char(200) | YES  |     | NULL    |
+		 author      | char(50)  | YES  |     | NULL    |
+		 date        | datetime  | NO   |     | NULL    |
+		 type        | char(50)  | YES  |     | NULL    |
+		 language    | char(50)  | YES  |     | NULL    |
+		 length      | int(11)   | NO   |     | NULL    |
+		 address     | char(50)  | NO   |     | NULL    |
+		 sign        | bit(1)    | YES  |     | b'1'    |
+		 /
+		 in ema char(50),in tit char(50),in des char(200), in aut char(50),in ads char(50),in len int,in sig bit,in ida char(11)
+		 
+		 
+		$result = $db->query("call insertVideos('$iduser','$title',NULL,NULL,NULL,NULL,'$length','$address',1);");
+		echo $db->errno.":".$db->error;
+		if ($result){
+			move_uploaded_file($_FILES["file"]["tmp_name"],$address);
+			echo "<br /><br/><br /><br/>上传成功：Stored in: " . $_FILES["file"]["size"].$address."5秒后转回视频首页";
+		}
+    }
+  }
+else
+  {
+  echo $_FILES["file"]["type"]."Invalid file";
+  }
+  echo "<meta http-equiv='Refresh' content='2;url=index.php' />";
+  */
+?>

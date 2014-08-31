@@ -1,0 +1,67 @@
+<?php
+	require('/require.php');
+	//检测用户是否登录
+	if(isset($_SESSION['email']))
+	{
+		//获取用户请求
+		$friends = $_POST['suggest'];
+		$message = $_POST['message'];
+		//预处理用户字符串
+		if(!get_magic_quotes_gpc())
+		{
+			$friends = addslashes($friends);
+			$message = addslashes($message);
+		}
+		//检查数据库中是否存在用户请求的人
+		$sql = "select iduser from user where iduser='$friends';";
+		$result = $db->query($sql);
+		if($result)
+		{
+			if($row = $result->fetch_assoc())
+			{
+				$iduser2 = $row['iduser'];
+				//如果存在，用户间是否存在关系（关注，被关注，相互关注，相互陌生）
+				$Person = $_SESSION['email'];
+				$iduser1 = $Person->getElement('iduser');
+
+				$sql1 = "select sign from relation where (iduser1='$iduser1' and iduser2='$iduser2') or (iduser1='$iduser2' and iduser2='$iduser1');";
+				$result1 = $db->query($sql1);
+				if($result1)
+				{
+					//相互关注则 $sign = 1;除此之外 $sign = 0;
+					$sign = 0;
+					if($num = $result1->num_rows)
+					{
+						//用户间存在关系
+						$row = $result1->fetch_assoc();
+						$sign = $row['sign'];
+						if($sign!=0)
+						{
+							$sign=1;
+						}
+					}
+					//对于消息，0表示没有相互关注的人的私信，1表示相互关注的人互通信息
+					$sql = "insert into message values('$iduser1','$iduser2',now(),'$message','$sign',1);";
+
+					$result = $db->query($sql);
+					if($result)
+					{
+						echo "true";
+					}
+					else
+					{
+						echo "false";
+					}
+				}				
+			}
+			else
+			{
+				echo "false";
+			}
+		}
+		else
+		{
+			echo "false";
+		}
+	}
+?>

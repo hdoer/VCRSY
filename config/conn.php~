@@ -1,0 +1,43 @@
+<?php
+require_once'Exception.php';
+$hostname ='localhost';
+$username ='root';
+$password ='';
+$database ='vcrsd';
+global $db;
+
+try
+{
+	@$db = new mysqli($hostname,$username,$password,$database);
+	if ($db->connect_errno)
+		throw new dbconnectException("连接数据库失败");
+	$result = $db->query('set character_set_connection=utf8,character_set_client=binary,character_set_results=utf8;');
+	if (!$result)
+	{
+		displayPrompt("设置字符集失败");
+	}
+}
+catch (dbconnectException $e)
+{
+	$prompt = $e->__toString();
+	displayPrompt("$prompt");
+}
+function displayPrompt($prompt,$location=null)
+{
+	header('Content-Type: text/html; charset=utf-8'); 
+	global $db;
+	if ($location==null)
+	{
+		echo"<script type='text/javascript'>alert('$prompt');window.history.back();</script>";
+	}
+	else
+	{
+		echo"<script type='text/javascript'>alert('$prompt');location='$location';</script>";
+	}
+}
+function displayPrompt2($prompt)
+{
+	header('Content-Type: text/html; charset=utf-8'); 
+	echo"<script type='text/javascript'>alert('$prompt');</script>";
+}
+?>
